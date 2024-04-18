@@ -21,3 +21,7 @@ go.work
 .vscode/*
 !.vscode/settings.json
 !.vscode/extensions.json
+
+# Local config files
+config.local.yaml
+config.*.local.yaml

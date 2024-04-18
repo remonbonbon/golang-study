@@ -34,7 +34,8 @@ func (g *GlobalLoader[C]) Load() error {
 	return nil
 }
 
-// 設定値を返す
+// 設定値を返す。
+// 設定ファイルが読み込まれていない場合は読み込む。
 func (g *GlobalLoader[C]) Get() *C {
 	if g.conf == nil {
 		err := g.Load()

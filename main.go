@@ -49,5 +49,6 @@ func main() {
 		panic("エラーです！")
 	})
 
+	logger.Info("Listen on http://localhost:8080")
 	http.ListenAndServe("localhost:8080", r)
 }
