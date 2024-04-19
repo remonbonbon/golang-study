@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log/slog"
 	"net/http"
 	"time"
@@ -14,7 +13,7 @@ import (
 )
 
 func main() {
-	fmt.Printf("%+v\n", *config.Get())
+	config.Load()
 
 	r := chi.NewRouter()
 
