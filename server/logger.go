@@ -2,6 +2,7 @@ package server
 
 import (
 	"log/slog"
+	"time"
 
 	"github.com/go-chi/httplog/v2"
 
@@ -27,9 +28,12 @@ func NewLogger() *httplog.Logger {
 		}
 		logger = httplog.NewLogger("main", httplog.Options{
 			LogLevel:         logLevel[conf.LogLevel],
-			MessageFieldName: "message",
 			Concise:          devMode,
 			JSON:             !devMode,
+			TimeFieldName:    "timestamp",
+			TimeFieldFormat:  time.RFC3339,
+			MessageFieldName: "message",
+			LevelFieldName:   "level",
 			SourceFieldName:  source,
 		})
 	}
