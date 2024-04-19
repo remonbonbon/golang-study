@@ -11,7 +11,7 @@ import (
 	"github.com/go-chi/httplog/v2"
 
 	"example.com/golang-study/config"
-	"example.com/golang-study/service/welcome"
+	"example.com/golang-study/controller"
 )
 
 func main() {
@@ -53,10 +53,14 @@ func main() {
 	r.Use(middleware.Recoverer)
 
 	// ルーティング
-	r.Get("/", welcome.Get)
+	r.Get("/", controller.Welcome)
+	r.Get("/users/{id}", controller.FindUser)
 
 	// サーバー起動
 	logger.Debug("config", slog.Any("config", *conf))
 	logger.Info(fmt.Sprintf("Listen on http://%s", conf.Listen))
-	http.ListenAndServe(conf.Listen, r)
+	err := http.ListenAndServe(conf.Listen, r)
+	if err != nil {
+		logger.Error("Listen failed", slog.Any("error", err))
+	}
 }
