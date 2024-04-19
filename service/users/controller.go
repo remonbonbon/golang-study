@@ -1,6 +1,7 @@
 package users
 
 import (
+	"encoding/json"
 	"net/http"
 	"regexp"
 
@@ -17,19 +18,24 @@ func Get(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	body, err := dummymodel.FindUser(id)
+	user, err := dummymodel.FindUser(id)
 	if err != nil {
-		srv.WriteError(w, r, srv.InternalServerError("エラーです。", &err))
-		return
-	}
-
-	s := string(body)
-	if s == "{}" {
-		srv.WriteError(w, r, srv.NotFound("見つかりませんでした。", &err))
+		switch err.(type) {
+		case *dummymodel.NotFoundError:
+			srv.WriteError(w, r, srv.NotFound("ユーザーが見つかりません。", nil))
+		default:
+			srv.WriteError(w, r, err)
+		}
 		return
 	}
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	w.Write([]byte(body))
+
+	bytes, err := json.Marshal(user)
+	if err != nil {
+		srv.WriteError(w, r, err)
+		return
+	}
+	w.Write(bytes)
 }
