@@ -1,10 +1,10 @@
-package welcome
+package welcome_controller
 
 import (
 	"net/http"
 )
 
-func Get(w http.ResponseWriter, r *http.Request) {
+func Index(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte(`
 <h1>Hello, world!</h1>
 <ul>

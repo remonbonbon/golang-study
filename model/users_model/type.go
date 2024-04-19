@@ -1,4 +1,4 @@
-package dummymodel
+package users_model
 
 import (
 	"fmt"
