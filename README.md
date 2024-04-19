@@ -52,6 +52,9 @@ import "<モジュール名>/foo/bar"
 
 #### 設定ファイル
 
+<https://github.com/spf13/viper>を使う。
+
 参考:
 - <https://zenn.dev/heartrails/articles/7899565fc04673>
 - <https://github.com/mrk21/go-web-config-sample>
+- 自前で実装するのは微妙なので、viperを使って似たような設定ファイル構成にする。
