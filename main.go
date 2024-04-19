@@ -10,7 +10,6 @@ import (
 )
 
 func main() {
-	config.Load()
 	conf := config.Get()
 
 	logger := server.NewLogger()
