@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log/slog"
 	"net/http"
 	"time"
@@ -14,16 +15,28 @@ import (
 
 func main() {
 	config.Load()
+	conf := config.Get()
 
 	r := chi.NewRouter()
 
 	// Logger
-	devMode := true
+	devMode := config.IsDevEnv()
+	logLevel := map[string]slog.Level{
+		"DEBUG": slog.LevelDebug,
+		"INFO":  slog.LevelInfo,
+		"WARN":  slog.LevelWarn,
+		"ERROR": slog.LevelError,
+	}
+	source := "source"
+	if devMode {
+		source = "" // Set "" to disable
+	}
 	logger := httplog.NewLogger("main", httplog.Options{
-		LogLevel:         slog.LevelDebug,
+		LogLevel:         logLevel[conf.LogLevel],
 		MessageFieldName: "message",
 		Concise:          devMode,
 		JSON:             !devMode,
+		SourceFieldName:  source,
 	})
 
 	// A good base middleware stack
@@ -48,6 +61,7 @@ func main() {
 		panic("エラーです！")
 	})
 
-	logger.Info("Listen on http://localhost:8080")
-	http.ListenAndServe("localhost:8080", r)
+	logger.Debug("config", slog.Any("config", *conf))
+	logger.Info(fmt.Sprintf("Listen on http://%s", conf.Listen))
+	http.ListenAndServe(conf.Listen, r)
 }

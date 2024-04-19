@@ -1,4 +1,6 @@
 # ----------- dev環境 -----------
+listen: 127.0.0.1:8080
+logLevel: DEBUG
 hoge: dev環境
 fuga:
   bar:

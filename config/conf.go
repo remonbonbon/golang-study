@@ -5,7 +5,9 @@ package config
 // - 変数定義の最後に `yaml:"fuga"` を付けるとキーを変更できる。
 // See: https://pkg.go.dev/gopkg.in/yaml.v3#Marshal
 type Config struct {
-	Hoge string
+	Listen   string // listenするホストとポート (例: 0.0.0.0:8080)
+	LogLevel string // ログレベル (DEBUG, INFO, WARN, ERROR)
+
 	Fuga struct {
 		Bar struct {
 			Value1 int

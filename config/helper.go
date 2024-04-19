@@ -115,3 +115,8 @@ func IsTestEnv() bool {
 	// go testでTestMain()が実行されるタイミングで設定される
 	return flag.Lookup("test.v") != nil
 }
+
+// dev環境の場合trueを返す
+func IsDevEnv() bool {
+	return CurrentEnv() == EnvDev
+}
