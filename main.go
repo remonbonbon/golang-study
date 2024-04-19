@@ -11,56 +11,51 @@ import (
 	"github.com/go-chi/httplog/v2"
 
 	"example.com/golang-study/config"
+	"example.com/golang-study/service/welcome"
 )
 
 func main() {
+	// 設定ファイル読み込み
 	config.Load()
 	conf := config.Get()
 
+	// Logger
+	var logger *httplog.Logger
+	{
+		devMode := config.IsDevEnv()
+		logLevel := map[string]slog.Level{
+			"DEBUG": slog.LevelDebug,
+			"INFO":  slog.LevelInfo,
+			"WARN":  slog.LevelWarn,
+			"ERROR": slog.LevelError,
+		}
+		source := "source"
+		if devMode {
+			source = "" // Set "" to disable
+		}
+		logger = httplog.NewLogger("main", httplog.Options{
+			LogLevel:         logLevel[conf.LogLevel],
+			MessageFieldName: "message",
+			Concise:          devMode,
+			JSON:             !devMode,
+			SourceFieldName:  source,
+		})
+	}
+
 	r := chi.NewRouter()
 
-	// Logger
-	devMode := config.IsDevEnv()
-	logLevel := map[string]slog.Level{
-		"DEBUG": slog.LevelDebug,
-		"INFO":  slog.LevelInfo,
-		"WARN":  slog.LevelWarn,
-		"ERROR": slog.LevelError,
-	}
-	source := "source"
-	if devMode {
-		source = "" // Set "" to disable
-	}
-	logger := httplog.NewLogger("main", httplog.Options{
-		LogLevel:         logLevel[conf.LogLevel],
-		MessageFieldName: "message",
-		Concise:          devMode,
-		JSON:             !devMode,
-		SourceFieldName:  source,
-	})
-
-	// A good base middleware stack
+	// ミドルウェア
 	r.Use(middleware.RequestID)
 	r.Use(middleware.RealIP)
 	r.Use(httplog.RequestLogger(logger))
 	r.Use(middleware.Compress(5))
+	r.Use(middleware.Timeout(60 * time.Second))
 	r.Use(middleware.Recoverer)
 
-	// Set a timeout value on the request context (ctx), that will signal
-	// through ctx.Done() that the request has timed out and further
-	// processing should be stopped.
-	r.Use(middleware.Timeout(60 * time.Second))
+	// ルーティング
+	r.Get("/", welcome.Get)
 
-	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
-		oplog := httplog.LogEntry(r.Context())
-		w.Write([]byte("welcome"))
-		oplog.Info("ログてすと")
-	})
-
-	r.Get("/error", func(w http.ResponseWriter, r *http.Request) {
-		panic("エラーです！")
-	})
-
+	// サーバー起動
 	logger.Debug("config", slog.Any("config", *conf))
 	logger.Info(fmt.Sprintf("Listen on http://%s", conf.Listen))
 	http.ListenAndServe(conf.Listen, r)
