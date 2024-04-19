@@ -53,6 +53,8 @@ func WriteError(w http.ResponseWriter, r *http.Request, e BusinessError) {
 	if err != nil {
 		panic(err)
 	}
+
+	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(e.Status)
 	w.Write([]byte(j))
 }
