@@ -1,4 +1,4 @@
-package welcome_controller
+package welcome_route
 
 import (
 	"net/http"

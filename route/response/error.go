@@ -1,4 +1,4 @@
-package service
+package route
 
 import (
 	"encoding/json"

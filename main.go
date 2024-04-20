@@ -5,15 +5,16 @@ import (
 	"log/slog"
 	"net/http"
 
+	"example.com/golang-study/common/log"
 	"example.com/golang-study/config"
-	"example.com/golang-study/server"
+	"example.com/golang-study/route"
 )
 
 func main() {
 	conf := config.Get()
 
-	logger := server.NewLogger()
-	r := server.NewRouter(logger)
+	logger := log.NewLogger()
+	r := route.NewRouter(logger)
 
 	// サーバー起動
 	logger.Info(fmt.Sprintf("Listen on http://%s", conf.Listen))

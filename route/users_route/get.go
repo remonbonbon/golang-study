@@ -1,13 +1,12 @@
-package users_controller
+package users_route
 
 import (
 	"encoding/json"
 	"net/http"
 	"regexp"
 
-	ctl "example.com/golang-study/controller"
-	"example.com/golang-study/model/users_model"
-	"example.com/golang-study/service/users"
+	res "example.com/golang-study/route/response"
+	"example.com/golang-study/usecase/users_usecase"
 )
 
 func Get(w http.ResponseWriter, r *http.Request) {
@@ -15,17 +14,17 @@ func Get(w http.ResponseWriter, r *http.Request) {
 
 	re := regexp.MustCompile(`^[0-9]{1,10}$`)
 	if !re.MatchString(id) {
-		ctl.WriteError(w, r, ctl.BadRequest("IDは数字です。", nil))
+		res.WriteError(w, r, res.BadRequest("IDは数字です。", nil))
 		return
 	}
 
-	user, err := users.FindUser(id)
+	user, err := users_usecase.FindUser(id)
 	if err != nil {
 		switch err.(type) {
-		case *users_model.NotFoundError:
-			ctl.WriteError(w, r, ctl.NotFound("ユーザーが見つかりません。", nil))
+		// case *users_model.NotFoundError:
+		// 	res.WriteError(w, r, res.NotFound("ユーザーが見つかりません。", nil))
 		default:
-			ctl.WriteError(w, r, err)
+			res.WriteError(w, r, err)
 		}
 		return
 	}
@@ -35,7 +34,7 @@ func Get(w http.ResponseWriter, r *http.Request) {
 
 	bytes, err := json.Marshal(user)
 	if err != nil {
-		ctl.WriteError(w, r, err)
+		res.WriteError(w, r, err)
 		return
 	}
 	w.Write(bytes)

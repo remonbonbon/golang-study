@@ -1,4 +1,4 @@
-package server
+package route
 
 import (
 	"time"
@@ -7,8 +7,8 @@ import (
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/httplog/v2"
 
-	"example.com/golang-study/controller/users_controller"
-	"example.com/golang-study/controller/welcome_controller"
+	"example.com/golang-study/route/users_route"
+	"example.com/golang-study/route/welcome_route"
 )
 
 // ルーティングを設定
@@ -24,8 +24,8 @@ func NewRouter(logger *httplog.Logger) *chi.Mux {
 	r.Use(middleware.Recoverer)
 
 	// ルーティング
-	r.Get("/", welcome_controller.Index)
-	r.Get("/users/{id}", users_controller.Get)
+	r.Get("/", welcome_route.Index)
+	r.Get("/users/{id}", users_route.Get)
 
 	return r
 }

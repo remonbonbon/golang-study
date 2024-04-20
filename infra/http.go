@@ -1,16 +1,9 @@
-package users_model
+package infra
 
 import (
 	"fmt"
 	"net/http"
 )
-
-type User struct {
-	Id       int    `json:"id"`
-	Name     string `json:"name"`
-	UserName string `json:"username"`
-	Email    string `json:"email"`
-}
 
 type HTTPError struct {
 	Req *http.Request
