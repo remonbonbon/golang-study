@@ -8,12 +8,12 @@ import (
 	"github.com/go-chi/httplog/v2"
 )
 
-type errorResponse struct {
+type ErrorResponse struct {
 	Message string `json:"message"` // エラーメッセージ
 }
 
 // エラーレスポンスを送信する
-func WriteError(w http.ResponseWriter, r *http.Request, originalError error) {
+func ErrorJson(w http.ResponseWriter, r *http.Request, originalError error) {
 	logger := httplog.LogEntry(r.Context())
 
 	// BusinessErrorの場合はそのステータスコード等を使用する
@@ -42,5 +42,5 @@ func WriteError(w http.ResponseWriter, r *http.Request, originalError error) {
 		logger.Error(e.Message, attrs...)
 	}
 
-	Json(w, r, errorResponse{Message: e.Message})
+	Json(w, r, ErrorResponse{Message: e.Message})
 }
