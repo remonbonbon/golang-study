@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"example.com/golang-study/common"
+	"example.com/golang-study/common/message"
 	"github.com/go-chi/httplog/v2"
 )
 
@@ -23,7 +24,7 @@ func ErrorJson(w http.ResponseWriter, r *http.Request, originalError error) {
 		e = be
 	default:
 		// BusinessError以外の場合
-		e = &common.BusinessError{Status: http.StatusInternalServerError, Message: "system error", Err: originalError}
+		e = &common.BusinessError{Status: http.StatusInternalServerError, Message: message.SystemError(), Err: originalError}
 	}
 
 	// ステータスコード未設定の場合、500にする
