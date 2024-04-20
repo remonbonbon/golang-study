@@ -5,5 +5,5 @@ import (
 )
 
 type UsersRepository interface {
-	FindUser(id string) (*model.User, error)
+	FindUser(id string) (*model.User, bool, error)
 }
