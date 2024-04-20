@@ -3,6 +3,8 @@ package infra
 import (
 	"fmt"
 	"net/http"
+
+	"example.com/golang-study/common"
 )
 
 type HTTPError struct {
@@ -22,8 +24,12 @@ func (e *HTTPError) Error() string {
 	return str
 }
 
-type NotFoundError struct{}
+// ユーザーの入力がおかしい場合のエラー
+func SystemError(m string, req *http.Request, res *http.Response, e error) *common.BusinessError {
+	return common.SystemError(m, &HTTPError{Req: req, Err: e})
+}
 
-func (e *NotFoundError) Error() string {
-	return "not found"
+// 指定されたものが見つからなかった場合のエラー
+func NotFound(m string, req *http.Request, res *http.Response, e error) *common.BusinessError {
+	return common.NotFound(m, &HTTPError{Req: req, Err: e})
 }

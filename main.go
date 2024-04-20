@@ -5,7 +5,7 @@ import (
 	"log/slog"
 	"net/http"
 
-	"example.com/golang-study/common/log"
+	"example.com/golang-study/common"
 	"example.com/golang-study/config"
 	"example.com/golang-study/route"
 )
@@ -13,7 +13,7 @@ import (
 func main() {
 	conf := config.Get()
 
-	logger := log.NewLogger()
+	logger := common.NewLogger()
 	r := route.NewRouter(logger)
 
 	// サーバー起動

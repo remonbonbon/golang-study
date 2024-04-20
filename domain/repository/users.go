@@ -1,9 +1,9 @@
 package repository
 
 import (
-	"example.com/golang-study/domain/model/users_model"
+	"example.com/golang-study/domain/model"
 )
 
 type UsersRepository interface {
-	FindUser(id string) (*users_model.User, error)
+	FindUser(id string) (*model.User, error)
 }

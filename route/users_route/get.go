@@ -5,8 +5,9 @@ import (
 	"net/http"
 	"regexp"
 
+	"example.com/golang-study/common"
 	res "example.com/golang-study/route/response"
-	"example.com/golang-study/usecase/users_usecase"
+	"example.com/golang-study/usecase/users"
 )
 
 func Get(w http.ResponseWriter, r *http.Request) {
@@ -14,18 +15,13 @@ func Get(w http.ResponseWriter, r *http.Request) {
 
 	re := regexp.MustCompile(`^[0-9]{1,10}$`)
 	if !re.MatchString(id) {
-		res.WriteError(w, r, res.BadRequest("IDは数字です。", nil))
+		res.WriteError(w, r, common.InvalidInput("IDは数字です。", nil))
 		return
 	}
 
-	user, err := users_usecase.FindUser(id)
+	user, err := users.FindUser(id)
 	if err != nil {
-		switch err.(type) {
-		// case *users_model.NotFoundError:
-		// 	res.WriteError(w, r, res.NotFound("ユーザーが見つかりません。", nil))
-		default:
-			res.WriteError(w, r, err)
-		}
+		res.WriteError(w, r, err)
 		return
 	}
 
