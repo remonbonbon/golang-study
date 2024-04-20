@@ -5,7 +5,7 @@ import (
 	"regexp"
 
 	"example.com/golang-study/common"
-	res "example.com/golang-study/route/response"
+	res "example.com/golang-study/route/internal/response"
 	"example.com/golang-study/usecase/users"
 )
 
