@@ -1,7 +1,6 @@
-package users_route
+package users
 
 import (
-	"encoding/json"
 	"net/http"
 	"regexp"
 
@@ -25,13 +24,5 @@ func Get(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-
-	bytes, err := json.Marshal(user)
-	if err != nil {
-		res.WriteError(w, r, err)
-		return
-	}
-	w.Write(bytes)
+	res.Json(w, r, user)
 }

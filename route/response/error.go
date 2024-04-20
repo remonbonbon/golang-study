@@ -1,7 +1,6 @@
-package route
+package response
 
 import (
-	"encoding/json"
 	"log/slog"
 	"net/http"
 
@@ -17,13 +16,14 @@ type errorResponse struct {
 func WriteError(w http.ResponseWriter, r *http.Request, originalError error) {
 	logger := httplog.LogEntry(r.Context())
 
+	// BusinessErrorの場合はそのステータスコード等を使用する
 	var e *common.BusinessError
 	switch be := originalError.(type) {
 	case *common.BusinessError:
 		e = be
 	default:
 		// BusinessError以外の場合
-		e = &common.BusinessError{Status: 500, Message: "system error", Err: originalError}
+		e = &common.BusinessError{Status: http.StatusInternalServerError, Message: "system error", Err: originalError}
 	}
 
 	// ステータスコード未設定の場合、500にする
@@ -42,12 +42,5 @@ func WriteError(w http.ResponseWriter, r *http.Request, originalError error) {
 		logger.Error(e.Message, attrs...)
 	}
 
-	j, err := json.Marshal(errorResponse{Message: e.Message})
-	if err != nil {
-		panic(err)
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(e.Status)
-	w.Write([]byte(j))
+	Json(w, r, errorResponse{Message: e.Message})
 }

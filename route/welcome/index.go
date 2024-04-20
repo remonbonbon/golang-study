@@ -1,4 +1,4 @@
-package welcome_route
+package welcome
 
 import (
 	"net/http"

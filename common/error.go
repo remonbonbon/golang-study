@@ -1,6 +1,9 @@
 package common
 
-import "runtime"
+import (
+	"net/http"
+	"runtime"
+)
 
 type BusinessError struct {
 	Status  int    `json:"status"`  // HTTPステータスコード
@@ -17,7 +20,7 @@ func (e *BusinessError) Error() string {
 // ユーザーの入力がおかしい場合のエラー。
 // HTTPステータスコード 400 Bad Request
 func InvalidInput(m string, e error) *BusinessError {
-	b := BusinessError{Status: 400, Message: m, Err: e}
+	b := BusinessError{Status: http.StatusBadRequest, Message: m, Err: e}
 	_, file, line, ok := runtime.Caller(1)
 	if ok {
 		b.File = file
@@ -29,7 +32,7 @@ func InvalidInput(m string, e error) *BusinessError {
 // 指定されたものが見つからなかった場合のエラー。
 // HTTPステータスコード 404 Not Found
 func NotFound(m string, e error) *BusinessError {
-	b := BusinessError{Status: 404, Message: m, Err: e}
+	b := BusinessError{Status: http.StatusNotFound, Message: m, Err: e}
 	_, file, line, ok := runtime.Caller(1)
 	if ok {
 		b.File = file
@@ -41,7 +44,7 @@ func NotFound(m string, e error) *BusinessError {
 // システムエラー。
 // HTTPステータスコード 500 Internal Server Error
 func SystemError(m string, e error) *BusinessError {
-	b := BusinessError{Status: 500, Message: m, Err: e}
+	b := BusinessError{Status: http.StatusInternalServerError, Message: m, Err: e}
 	_, file, line, ok := runtime.Caller(1)
 	if ok {
 		b.File = file
