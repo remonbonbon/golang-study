@@ -1,4 +1,4 @@
-package http
+package fetch
 
 import (
 	"encoding/json"
@@ -6,11 +6,11 @@ import (
 	"net/http"
 )
 
-func HTTPGet[Body any](url string) (*Body, bool, error) {
-	return HTTPRequest[Body]("GET", url)
+func Get[Body any](url string) (*Body, bool, error) {
+	return Request[Body]("GET", url)
 }
 
-func HTTPRequest[Body any](method string, url string) (*Body, bool, error) {
+func Request[Body any](method string, url string) (*Body, bool, error) {
 	req, err := http.NewRequest(method, url, nil)
 	if err != nil {
 		return nil, false, NewHTTPError("request failed", req, nil, err)
