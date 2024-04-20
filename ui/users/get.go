@@ -5,8 +5,9 @@ import (
 	"regexp"
 
 	"example.com/golang-study/common"
-	res "example.com/golang-study/route/internal/response"
-	"example.com/golang-study/usecase/users"
+	"example.com/golang-study/infra/repository"
+	"example.com/golang-study/logic/users"
+	res "example.com/golang-study/ui/internal/response"
 )
 
 func Get(w http.ResponseWriter, r *http.Request) {
@@ -18,7 +19,8 @@ func Get(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user, err := users.FindUser(id)
+	repo := repository.NewUsersRepository()
+	user, err := users.FindUser(repo, id)
 	if err != nil {
 		res.WriteError(w, r, err)
 		return

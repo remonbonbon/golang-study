@@ -1,4 +1,4 @@
-package route
+package ui
 
 import (
 	"time"
@@ -7,8 +7,8 @@ import (
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/httplog/v2"
 
-	"example.com/golang-study/route/users"
-	"example.com/golang-study/route/welcome"
+	"example.com/golang-study/ui/users"
+	"example.com/golang-study/ui/welcome"
 )
 
 // ルーティングを設定

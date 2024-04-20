@@ -7,14 +7,14 @@ import (
 
 	"example.com/golang-study/common"
 	"example.com/golang-study/config"
-	"example.com/golang-study/route"
+	"example.com/golang-study/ui"
 )
 
 func main() {
 	conf := config.Get()
 
 	logger := common.NewLogger()
-	r := route.NewRouter(logger)
+	r := ui.NewRouter(logger)
 
 	// サーバー起動
 	logger.Info(fmt.Sprintf("Listen on http://%s", conf.Listen))
