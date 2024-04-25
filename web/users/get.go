@@ -7,7 +7,7 @@ import (
 	"example.com/golang-study/common"
 	"example.com/golang-study/infra/repository"
 	"example.com/golang-study/usecase/users"
-	res "example.com/golang-study/web/internal/response"
+	res "example.com/golang-study/web/response"
 )
 
 func Get(w http.ResponseWriter, r *http.Request) {

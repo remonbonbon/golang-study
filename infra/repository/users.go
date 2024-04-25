@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"example.com/golang-study/domain/model"
-	"example.com/golang-study/infra/internal/fetch"
+	"example.com/golang-study/infra/fetch"
 )
 
 type UsersRepository struct{}
