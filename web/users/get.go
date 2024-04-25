@@ -5,8 +5,6 @@ import (
 	"net/http"
 	"regexp"
 
-	"github.com/go-chi/httplog/v2"
-
 	"example.com/golang-study/common"
 	"example.com/golang-study/infra/repository"
 	"example.com/golang-study/usecase/users"
@@ -14,9 +12,9 @@ import (
 )
 
 func Get(w http.ResponseWriter, r *http.Request) {
-	logger := httplog.LogEntry(r.Context())
-	logger.Info("test")
-	slog.Info("Hello, World!", "foo", "bar", "hoge", "fuga")
+	log := common.LogWith(r.Context())
+	log.Info("test")
+	log.Info("てすと", slog.Any("req", r))
 
 	id := r.PathValue("id")
 

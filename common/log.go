@@ -21,16 +21,17 @@ func NewLogger() *slog.Logger {
 		"ERROR": slog.LevelError,
 	}
 
-	opt := &slog.HandlerOptions{
-		AddSource: !devMode,
-		Level:     logLevel[conf.LogLevel]}
-
 	var logger *slog.Logger
 	if devMode {
-		// logger = slog.New(slog.NewTextHandler(os.Stdout, opt))
-		logger = slog.New(NewMyHandler(os.Stdout, &MyHandlerOptions{Level: slog.LevelDebug}))
+		// logger = slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{
+		// 	AddSource: !devMode,
+		// 	Level:     logLevel[conf.LogLevel]}))
+		logger = slog.New(NewHumanHandler(os.Stdout, &HumanHandlerOptions{
+			Level: slog.LevelDebug}))
 	} else {
-		logger = slog.New(slog.NewJSONHandler(os.Stdout, opt))
+		logger = slog.New(slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{
+			AddSource: !devMode,
+			Level:     logLevel[conf.LogLevel]}))
 	}
 	return logger
 }
@@ -38,7 +39,6 @@ func NewLogger() *slog.Logger {
 func LogWith(ctx context.Context) *slog.Logger {
 	var l = slog.Default()
 	l = l.With(
-		slog.String("reqID1", middleware.GetReqID(ctx)),
-		slog.String("reqID2", middleware.GetReqID(ctx)))
+		slog.String("reqID", middleware.GetReqID(ctx)))
 	return l
 }

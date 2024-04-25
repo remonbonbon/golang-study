@@ -6,60 +6,121 @@ import (
 	"io"
 	"log/slog"
 	"sync"
-	"time"
 )
 
-type MyHandler struct {
-	opts  MyHandlerOptions
-	attrs []slog.Attr // attrs if non-empty
-	mu    *sync.Mutex
-	out   io.Writer
+// 人間が読みやすいように出力するロガー
+type HumanHandler struct {
+	opts HumanHandlerOptions
+	mu   *sync.Mutex
+	out  io.Writer
+
+	attrs []slog.Attr
 }
 
-type MyHandlerOptions struct {
-	// Level reports the minimum level to log.
-	// Levels with lower levels are discarded.
-	// If nil, the Handler uses [slog.LevelInfo].
-	Level slog.Leveler
+type HumanHandlerOptions struct {
+	Level slog.Leveler // 最小ログレベル
 }
 
-func NewMyHandler(out io.Writer, opts *MyHandlerOptions) *MyHandler {
-	h := &MyHandler{out: out, mu: &sync.Mutex{}}
+func NewHumanHandler(out io.Writer, opts *HumanHandlerOptions) *HumanHandler {
+	h := &HumanHandler{out: out, mu: &sync.Mutex{}}
 	if opts != nil {
 		h.opts = *opts
 	}
 	if h.opts.Level == nil {
-		h.opts.Level = slog.LevelInfo
+		h.opts.Level = slog.LevelDebug
 	}
 	return h
 }
 
-func (h *MyHandler) Enabled(ctx context.Context, level slog.Level) bool {
+func (h *HumanHandler) Enabled(ctx context.Context, level slog.Level) bool {
 	return level >= h.opts.Level.Level()
 }
 
-func (h *MyHandler) Handle(ctx context.Context, r slog.Record) error {
-	fmt.Printf("")
+func (h *HumanHandler) Handle(ctx context.Context, r slog.Record) error {
+	// ログレベルに応じた色付け
+	color := ColorRed
+	switch r.Level {
+	case slog.LevelDebug:
+		color = ColorCyan
+	case slog.LevelInfo:
+		color = ColorGreen
+	case slog.LevelWarn:
+		color = ColorYellow
+	}
+
+	// 高速化のために[]byteバッファを確保してfmt.Appendf()していく
 	buf := make([]byte, 0, 1024)
 
-	buf = fmt.Appendf(buf, "%s", r.Time.Format(time.RFC3339Nano))
-	buf = fmt.Appendf(buf, " [%v] ", r.Level)
-	buf = fmt.Appendf(buf, "%s", r.Message)
-	buf = fmt.Appendf(buf, "%+v", h.attrs)
+	// 固定のフィールド
+	buf = fmt.Appendf(buf, "%s%s [%s] %s%s",
+		r.Time.Format("2006-01-02 15:04:05.000"),
+		color,
+		r.Level,
+		r.Message,
+		ColorReset)
+
+	// ログメソッドで追加されたフィールド
+	if 0 < len(h.attrs) {
+		buf = fmt.Appendf(buf, " ")
+	}
+	for index, value := range h.attrs {
+		if 0 < index {
+			buf = fmt.Appendf(buf, " ")
+		}
+		buf = fmt.Appendf(buf, toString(value, ""))
+	}
+
+	// With()で追加されたフィールド
+	if 0 < r.NumAttrs() {
+		buf = fmt.Appendf(buf, " ")
+	}
+	i := 0
+	r.Attrs(func(a slog.Attr) bool {
+		if 0 < i {
+			buf = fmt.Appendf(buf, " ")
+		}
+		buf = fmt.Appendf(buf, toString(a, ""))
+		i++
+		return true
+	})
+
 	buf = fmt.Appendf(buf, "\n")
 
+	// 出力
 	h.mu.Lock()
 	defer h.mu.Unlock()
 	_, err := h.out.Write(buf)
 	return err
 }
 
-// 未実装。使用しない
-func (h *MyHandler) WithAttrs(attrs []slog.Attr) slog.Handler {
+func toString(a slog.Attr, parent string) string {
+	switch a.Value.Kind() {
+	case slog.KindGroup:
+		s := ""
+		for index, value := range a.Value.Group() {
+			if 0 < index {
+				s += " "
+			}
+			name := parent + a.Key + "."
+			s += toString(value, name)
+		}
+		return s
+	default:
+		return fmt.Sprintf("%s%s%s%s=%s",
+			ColorMagenta,
+			parent,
+			a.Key,
+			ColorReset,
+			a.Value.String())
+	}
+}
+
+func (h *HumanHandler) WithAttrs(attrs []slog.Attr) slog.Handler {
 	if len(attrs) == 0 {
 		return h
 	}
 
+	// attrsを連結した新しいインスタンスを作成
 	h2 := *h
 	h2.attrs = make([]slog.Attr, len(h.attrs))
 	copy(h2.attrs, h.attrs)
@@ -67,8 +128,6 @@ func (h *MyHandler) WithAttrs(attrs []slog.Attr) slog.Handler {
 	return &h2
 }
 
-// 未実装。使用しない
-func (h *MyHandler) WithGroup(name string) slog.Handler {
-	panic("WithGroup()は未実装")
-	// return h
+func (h *HumanHandler) WithGroup(name string) slog.Handler {
+	panic("未実装")
 }
