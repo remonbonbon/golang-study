@@ -1,8 +1,11 @@
 package users
 
 import (
+	"log/slog"
 	"net/http"
 	"regexp"
+
+	"github.com/go-chi/httplog/v2"
 
 	"example.com/golang-study/common"
 	"example.com/golang-study/infra/repository"
@@ -11,6 +14,10 @@ import (
 )
 
 func Get(w http.ResponseWriter, r *http.Request) {
+	logger := httplog.LogEntry(r.Context())
+	logger.Info("test")
+	slog.Info("Hello, World!", "foo", "bar", "hoge", "fuga")
+
 	id := r.PathValue("id")
 
 	re := regexp.MustCompile(`^[0-9]{1,10}$`)

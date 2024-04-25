@@ -16,8 +16,8 @@ import (
 
 func main() {
 	conf := config.Get()
-	logger := common.NewLogger()
-	srv := http.Server{Addr: conf.Listen, Handler: web.NewRouter(logger)}
+	slog.SetDefault(common.NewLogger())
+	srv := http.Server{Addr: conf.Listen, Handler: web.NewRouter()}
 
 	// Graceful shutdown
 	idleConnsClosed := make(chan struct{})
@@ -29,16 +29,16 @@ func main() {
 
 		// シグナル発生したらサーバーを終了
 		if err := srv.Shutdown(context.Background()); err != nil {
-			logger.Error("Shutdown failed", slog.Any("error", err))
+			slog.Error("Shutdown failed", slog.Any("error", err))
 		}
-		logger.Info("Shutdown server")
+		slog.Info("Shutdown server")
 		close(idleConnsClosed)
 	}()
 
 	// サーバー起動
-	logger.Info(fmt.Sprintf("Listen on http://%s", conf.Listen))
+	slog.Info(fmt.Sprintf("Listen on http://%s", conf.Listen))
 	if err := srv.ListenAndServe(); err != http.ErrServerClosed {
-		logger.Error("Listen failed", slog.Any("error", err))
+		slog.Error("Listen failed", slog.Any("error", err))
 		return
 	}
 
