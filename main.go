@@ -16,11 +16,8 @@ import (
 
 func main() {
 	conf := config.Get()
-
 	logger := common.NewLogger()
-	r := web.NewRouter(logger)
-
-	srv := http.Server{Addr: conf.Listen, Handler: r}
+	srv := http.Server{Addr: conf.Listen, Handler: web.NewRouter(logger)}
 
 	// Graceful shutdown
 	idleConnsClosed := make(chan struct{})
