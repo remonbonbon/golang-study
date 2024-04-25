@@ -1,7 +1,6 @@
 package users
 
 import (
-	"log/slog"
 	"net/http"
 	"regexp"
 
@@ -12,9 +11,8 @@ import (
 )
 
 func Get(w http.ResponseWriter, r *http.Request) {
-	log := common.LogWith(r.Context())
-	log.Info("test")
-	log.Info("てすと", slog.Any("req", r))
+	// log := common.LogWith(r.Context())
+	// log.Info("test")
 
 	id := r.PathValue("id")
 

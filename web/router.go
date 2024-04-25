@@ -1,6 +1,7 @@
 package web
 
 import (
+	"fmt"
 	"net/http"
 	"time"
 
@@ -12,18 +13,6 @@ import (
 	"example.com/golang-study/web/welcome"
 )
 
-func MyLogger(next http.Handler) http.Handler {
-	fn := func(w http.ResponseWriter, r *http.Request) {
-		ctx := r.Context()
-		log := common.LogWith(ctx)
-
-		log.Info("Before")
-		next.ServeHTTP(w, r.WithContext(ctx))
-		log.Info("After")
-	}
-	return http.HandlerFunc(fn)
-}
-
 // ルーティングを設定
 func NewRouter() *chi.Mux {
 	r := chi.NewRouter()
@@ -31,7 +20,7 @@ func NewRouter() *chi.Mux {
 	// ミドルウェア
 	r.Use(middleware.RequestID)
 	r.Use(middleware.RealIP)
-	r.Use(MyLogger)
+	r.Use(myLogger)
 	r.Use(middleware.Compress(5))
 	r.Use(middleware.Timeout(60 * time.Second))
 	r.Use(middleware.Recoverer)
@@ -47,4 +36,47 @@ func NewRouter() *chi.Mux {
 	r.Get("/users/{id}", users.Get)
 
 	return r
+}
+
+// ロガーをcontextに埋め込む、アクセスログを出力する
+func myLogger(next http.Handler) http.Handler {
+	fn := func(w http.ResponseWriter, r *http.Request) {
+		ctx := common.ContextWithLogger(r.Context()) // ロガーをcontextに埋め込む
+		log := common.LogWith(ctx)
+
+		method := r.Method
+		path := r.URL.Path
+
+		// リクエストのログ
+		log.Info(fmt.Sprintf("%s %s", method, path))
+
+		// リクエストの処理
+		sw := &StatusWriter{OriginalWriter: w}
+		next.ServeHTTP(sw, r.WithContext(ctx))
+
+		// レスポンスのログ
+		text := fmt.Sprintf("%s %s (%d)", method, path, sw.Status)
+		if sw.Status < 400 {
+			log.Info(text)
+		} else {
+			log.Warn(text)
+		}
+	}
+	return http.HandlerFunc(fn)
+}
+
+type StatusWriter struct {
+	OriginalWriter http.ResponseWriter
+	Status         int
+}
+
+func (w *StatusWriter) Header() http.Header {
+	return w.OriginalWriter.Header()
+}
+func (w *StatusWriter) Write(b []byte) (int, error) {
+	return w.OriginalWriter.Write(b)
+}
+func (w *StatusWriter) WriteHeader(status int) {
+	w.Status = status
+	w.OriginalWriter.WriteHeader(status)
 }

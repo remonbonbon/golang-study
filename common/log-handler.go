@@ -93,6 +93,7 @@ func (h *HumanHandler) Handle(ctx context.Context, r slog.Record) error {
 	return err
 }
 
+// slog.Attrを文字列化
 func toString(a slog.Attr, parent string) string {
 	switch a.Value.Kind() {
 	case slog.KindGroup:
@@ -106,7 +107,7 @@ func toString(a slog.Attr, parent string) string {
 		}
 		return s
 	default:
-		return fmt.Sprintf("%s%s%s%s=%s",
+		return fmt.Sprintf("%s%s%s%s=%+v",
 			ColorMagenta,
 			parent,
 			a.Key,

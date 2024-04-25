@@ -19,14 +19,6 @@ func main() {
 	slog.SetDefault(common.NewLogger())
 	srv := http.Server{Addr: conf.Listen, Handler: web.NewRouter()}
 
-	slog.Debug("でばっぐ", slog.String("hoge", "piyo"))
-	slog.Info("いんふぉ", slog.String("hoge", "piyo"))
-	slog.Warn("わーん", slog.String("hoge", "piyo"))
-	slog.Error("えらー", slog.String("hoge", "piyo"))
-	slog.Info("グループテスト", slog.Group("g", slog.Int("a", 1), slog.Int("b", 2)))
-	slog.Info("グループ入れ子", slog.Group("A", slog.Group("B", slog.Int("a", 1)), slog.Int("b", 2)))
-	slog.With(slog.Group("group", slog.Int("hoge", 123))).Info("Withテスト")
-
 	// Graceful shutdown
 	idleConnsClosed := make(chan struct{})
 	go func() {

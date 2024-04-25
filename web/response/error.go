@@ -43,5 +43,5 @@ func ErrorJson(w http.ResponseWriter, r *http.Request, originalError error) {
 		logger.Error(e.Message, attrs...)
 	}
 
-	Json(w, r, ErrorResponse{Message: e.Message})
+	JsonWithStatus(w, r, ErrorResponse{Message: e.Message}, e.Status)
 }

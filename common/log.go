@@ -36,9 +36,24 @@ func NewLogger() *slog.Logger {
 	return logger
 }
 
-func LogWith(ctx context.Context) *slog.Logger {
-	var l = slog.Default()
-	l = l.With(
+type ctxKey int
+
+const (
+	loggerKey ctxKey = iota
+)
+
+// Contextにロガーを保存
+func ContextWithLogger(ctx context.Context) context.Context {
+	log := slog.Default().With(
 		slog.String("reqID", middleware.GetReqID(ctx)))
-	return l
+	return context.WithValue(ctx, loggerKey, log)
+}
+
+// Contextのロガーを取得
+func LogWith(ctx context.Context) *slog.Logger {
+	log, ok := ctx.Value(loggerKey).(*slog.Logger)
+	if ok {
+		return log
+	}
+	return slog.Default()
 }
