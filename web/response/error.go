@@ -6,7 +6,6 @@ import (
 
 	"example.com/golang-study/common"
 	"example.com/golang-study/common/message"
-	"github.com/go-chi/httplog/v2"
 )
 
 type ErrorResponse struct {
@@ -15,7 +14,7 @@ type ErrorResponse struct {
 
 // エラーレスポンスを送信する
 func ErrorJson(w http.ResponseWriter, r *http.Request, originalError error) {
-	logger := httplog.LogEntry(r.Context())
+	log := common.LogWith(r.Context())
 
 	// BusinessErrorの場合はそのステータスコード等を使用する
 	var e *common.BusinessError
@@ -38,9 +37,9 @@ func ErrorJson(w http.ResponseWriter, r *http.Request, originalError error) {
 		attrs = append(attrs, slog.Any("error", e.Err))
 	}
 	if e.Status < 500 {
-		logger.Warn(e.Message, attrs...)
+		log.Warn(e.Message, attrs...)
 	} else {
-		logger.Error(e.Message, attrs...)
+		log.Error(e.Message, attrs...)
 	}
 
 	JsonWithStatus(w, r, ErrorResponse{Message: e.Message}, e.Status)

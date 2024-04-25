@@ -5,6 +5,9 @@ import (
 	"fmt"
 	"io"
 	"log/slog"
+	"os"
+	"path/filepath"
+	"runtime"
 	"sync"
 )
 
@@ -83,6 +86,15 @@ func (h *HumanHandler) Handle(ctx context.Context, r slog.Record) error {
 		i++
 		return true
 	})
+
+	// 呼び出し元。カレントディレクトリからの相対パスにする
+	_, file, line, ok := runtime.Caller(3)
+	if ok {
+		dir, _ := os.Getwd()
+		rel, _ := filepath.Rel(dir, file)
+		rel = filepath.ToSlash(rel)
+		buf = fmt.Appendf(buf, " %s<%s:%d>%s", ColorBlack, rel, line, ColorReset)
+	}
 
 	buf = fmt.Appendf(buf, "\n")
 

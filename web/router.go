@@ -55,16 +55,12 @@ func myLogger(next http.Handler) http.Handler {
 		next.ServeHTTP(sw, r.WithContext(ctx))
 
 		// レスポンスのログ
-		text := fmt.Sprintf("%s %s (%d)", method, path, sw.Status)
-		if sw.Status < 400 {
-			log.Info(text)
-		} else {
-			log.Warn(text)
-		}
+		log.Info(fmt.Sprintf("%s %s (%d)", method, path, sw.Status))
 	}
 	return http.HandlerFunc(fn)
 }
 
+// 書き込んだステータスコードを保存するResponseWriter
 type StatusWriter struct {
 	OriginalWriter http.ResponseWriter
 	Status         int

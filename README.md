@@ -47,7 +47,7 @@ import "<モジュール名>/foo/bar"
 
 #### logger
 
-<https://github.com/go-chi/httplog>を使う。
+slogをカスタマイズして使う。
 
 
 #### 設定ファイル
