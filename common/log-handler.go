@@ -11,7 +11,7 @@ import (
 	"sync"
 )
 
-// 人間が読みやすいように出力するロガー
+// 人間が読みやすいように出力するロガー (ローカル環境用)
 type HumanHandler struct {
 	opts HumanHandlerOptions
 	mu   *sync.Mutex
