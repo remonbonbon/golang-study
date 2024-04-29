@@ -1,6 +1,7 @@
 package web
 
 import (
+	"errors"
 	"net/http"
 	"time"
 
@@ -35,7 +36,7 @@ func NewRouter() *chi.Mux {
 	r.Get("/", welcome.Index)
 	r.Get("/users/{id}", users.Get)
 	r.Get("/error", func(w http.ResponseWriter, r *http.Request) {
-		res.ErrorJson(w, r, common.SystemError("エラーテスト", nil))
+		res.ErrorJson(w, r, common.SystemError("エラーテスト", errors.New("test error")))
 	})
 
 	return r

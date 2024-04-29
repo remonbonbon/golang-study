@@ -33,13 +33,24 @@ func ErrorJson(w http.ResponseWriter, r *http.Request, originalError error) {
 
 	// ステータスコード400番台はログレベル WARN、500番台はログレベル ERROR
 	var attrs []any
+	attrs = append(attrs,
+		slog.Int("status", e.Status),
+	)
+	if 0 < e.Line {
+		attrs = append(attrs,
+			slog.String("function", e.Function),
+			slog.String("file", e.File),
+			slog.Int("line", e.Line),
+		)
+	}
 	if e.Err != nil {
 		attrs = append(attrs, slog.Any("error", e.Err))
 	}
+
 	if e.Status < 500 {
-		log.Warn(e.Message, attrs...)
+		log.Warn(e.Error(), attrs...)
 	} else {
-		log.Error(e.Message, attrs...)
+		log.Error(e.Error(), attrs...)
 	}
 
 	JsonWithStatus(w, r, ErrorResponse{Message: e.Message}, e.Status)

@@ -1,28 +1,39 @@
 package common
 
 import (
+	"fmt"
 	"net/http"
 	"runtime"
 )
 
 type BusinessError struct {
-	Status  int    `json:"status"`  // HTTPステータスコード
-	Message string `json:"message"` // エラーメッセージ
-	Err     error  `json:"error"`   // 発生したエラー (任意)
-	File    string `json:"file"`    // 呼び出し元のファイル
-	Line    int    `json:"line"`    // 呼び出し元の行
+	Status   int    `json:"status"`   // HTTPステータスコード
+	Message  string `json:"message"`  // エラーメッセージ
+	Err      error  `json:"error"`    // 発生したエラー (任意)
+	Function string `json:"function"` // 呼び出し元のメソッド名
+	File     string `json:"file"`     // 呼び出し元のファイル
+	Line     int    `json:"line"`     // 呼び出し元の行
 }
 
 func (e *BusinessError) Error() string {
-	return e.Message
+	s := e.Message
+	if 0 < e.Line {
+		s += fmt.Sprintf(" <%s:%d>", e.File, e.Line)
+	}
+	if e.Err != nil {
+		s += fmt.Sprintf(": %s", e.Err.Error())
+	}
+	return s
 }
 
 // ユーザーの入力がおかしい場合のエラー。
 // HTTPステータスコード 400 Bad Request
 func InvalidInput(m string, e error) *BusinessError {
 	b := BusinessError{Status: http.StatusBadRequest, Message: m, Err: e}
-	_, file, line, ok := runtime.Caller(1)
+	pc, file, line, ok := runtime.Caller(1)
 	if ok {
+		f := runtime.FuncForPC(pc)
+		b.Function = f.Name()
 		b.File = file
 		b.Line = line
 	}
