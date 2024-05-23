@@ -19,6 +19,8 @@ func main() {
 	slog.SetDefault(common.NewLogger())
 	srv := http.Server{Addr: conf.Listen, Handler: web.NewRouter()}
 
+	slog.Debug(fmt.Sprintf("%+v\n", conf))
+
 	// Graceful shutdown
 	idleConnsClosed := make(chan struct{})
 	go func() {
